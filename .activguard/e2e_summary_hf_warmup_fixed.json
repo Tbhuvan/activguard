@@ -1,0 +1,110 @@
+{
+  "overall": {
+    "activguard": {
+      "tp": 36,
+      "fp": 8,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8182,
+      "recall": 1.0,
+      "f1": 0.9
+    },
+    "bandit": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 36,
+      "tn": 8,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "semgrep": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 36,
+      "tn": 8,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "token_savings": {
+      "mean_frac": 0.0,
+      "median_frac": 0.0,
+      "n_early_stops": 36
+    }
+  },
+  "per_class": {
+    "auth_bypass": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.8889
+    },
+    "command_injection": {
+      "tp": 5,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8333,
+      "recall": 1.0,
+      "f1": 0.9091
+    },
+    "deserialization": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.8889
+    },
+    "idor": {
+      "tp": 5,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8333,
+      "recall": 1.0,
+      "f1": 0.9091
+    },
+    "path_traversal": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.8889
+    },
+    "sqli": {
+      "tp": 5,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8333,
+      "recall": 1.0,
+      "f1": 0.9091
+    },
+    "ssrf": {
+      "tp": 5,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8333,
+      "recall": 1.0,
+      "f1": 0.9091
+    },
+    "xss": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "tn": 0,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.8889
+    }
+  }
+}

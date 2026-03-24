@@ -1,0 +1,495 @@
+{
+  "0": {
+    "mean_auc": 0.54,
+    "std_auc": 0.0202,
+    "mean_f1": 0.3769,
+    "std_f1": 0.0826,
+    "per_fold_auc": [
+      0.5556,
+      0.5272,
+      0.5542,
+      0.5061,
+      0.5567
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 0,
+    "n_samples": 396
+  },
+  "1": {
+    "mean_auc": 0.6999,
+    "std_auc": 0.0325,
+    "mean_f1": 0.6441,
+    "std_f1": 0.0572,
+    "per_fold_auc": [
+      0.74,
+      0.6987,
+      0.7231,
+      0.6936,
+      0.6442
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 1,
+    "n_samples": 396
+  },
+  "2": {
+    "mean_auc": 0.7309,
+    "std_auc": 0.0319,
+    "mean_f1": 0.6624,
+    "std_f1": 0.0497,
+    "per_fold_auc": [
+      0.7256,
+      0.7821,
+      0.7135,
+      0.7462,
+      0.6872
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 2,
+    "n_samples": 396
+  },
+  "3": {
+    "mean_auc": 0.7563,
+    "std_auc": 0.0418,
+    "mean_f1": 0.6502,
+    "std_f1": 0.0222,
+    "per_fold_auc": [
+      0.7744,
+      0.7019,
+      0.8115,
+      0.7801,
+      0.7135
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 3,
+    "n_samples": 396
+  },
+  "4": {
+    "mean_auc": 0.7882,
+    "std_auc": 0.0446,
+    "mean_f1": 0.7065,
+    "std_f1": 0.0639,
+    "per_fold_auc": [
+      0.8094,
+      0.7955,
+      0.8564,
+      0.7462,
+      0.7333
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 4,
+    "n_samples": 396
+  },
+  "5": {
+    "mean_auc": 0.7759,
+    "std_auc": 0.0565,
+    "mean_f1": 0.7064,
+    "std_f1": 0.0527,
+    "per_fold_auc": [
+      0.8019,
+      0.7712,
+      0.8487,
+      0.7814,
+      0.6763
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 5,
+    "n_samples": 396
+  },
+  "6": {
+    "mean_auc": 0.7941,
+    "std_auc": 0.0411,
+    "mean_f1": 0.7049,
+    "std_f1": 0.0505,
+    "per_fold_auc": [
+      0.7744,
+      0.7987,
+      0.8712,
+      0.7538,
+      0.7724
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 6,
+    "n_samples": 396
+  },
+  "7": {
+    "mean_auc": 0.8048,
+    "std_auc": 0.0445,
+    "mean_f1": 0.7443,
+    "std_f1": 0.0455,
+    "per_fold_auc": [
+      0.7856,
+      0.8282,
+      0.8788,
+      0.7506,
+      0.7808
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 7,
+    "n_samples": 396
+  },
+  "8": {
+    "mean_auc": 0.7893,
+    "std_auc": 0.0565,
+    "mean_f1": 0.7252,
+    "std_f1": 0.0535,
+    "per_fold_auc": [
+      0.7625,
+      0.7891,
+      0.8981,
+      0.7429,
+      0.7538
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 8,
+    "n_samples": 396
+  },
+  "9": {
+    "mean_auc": 0.8045,
+    "std_auc": 0.05,
+    "mean_f1": 0.7197,
+    "std_f1": 0.034,
+    "per_fold_auc": [
+      0.7544,
+      0.8179,
+      0.8936,
+      0.7936,
+      0.7628
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 9,
+    "n_samples": 396
+  },
+  "10": {
+    "mean_auc": 0.7793,
+    "std_auc": 0.0581,
+    "mean_f1": 0.7084,
+    "std_f1": 0.0476,
+    "per_fold_auc": [
+      0.7531,
+      0.7865,
+      0.8622,
+      0.8077,
+      0.6872
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 10,
+    "n_samples": 396
+  },
+  "11": {
+    "mean_auc": 0.8112,
+    "std_auc": 0.0521,
+    "mean_f1": 0.7287,
+    "std_f1": 0.0609,
+    "per_fold_auc": [
+      0.7831,
+      0.8173,
+      0.8955,
+      0.8231,
+      0.7372
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 11,
+    "n_samples": 396
+  },
+  "12": {
+    "mean_auc": 0.8347,
+    "std_auc": 0.0548,
+    "mean_f1": 0.7248,
+    "std_f1": 0.0592,
+    "per_fold_auc": [
+      0.7619,
+      0.85,
+      0.9154,
+      0.8596,
+      0.7865
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 12,
+    "n_samples": 396
+  },
+  "13": {
+    "mean_auc": 0.8097,
+    "std_auc": 0.067,
+    "mean_f1": 0.7331,
+    "std_f1": 0.0738,
+    "per_fold_auc": [
+      0.7494,
+      0.809,
+      0.9231,
+      0.8314,
+      0.7359
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 13,
+    "n_samples": 396
+  },
+  "14": {
+    "mean_auc": 0.8195,
+    "std_auc": 0.0542,
+    "mean_f1": 0.7112,
+    "std_f1": 0.078,
+    "per_fold_auc": [
+      0.7938,
+      0.8173,
+      0.9186,
+      0.8128,
+      0.7551
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 14,
+    "n_samples": 396
+  },
+  "15": {
+    "mean_auc": 0.7776,
+    "std_auc": 0.0681,
+    "mean_f1": 0.71,
+    "std_f1": 0.0824,
+    "per_fold_auc": [
+      0.7644,
+      0.8026,
+      0.891,
+      0.7442,
+      0.6859
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 15,
+    "n_samples": 396
+  },
+  "16": {
+    "mean_auc": 0.8058,
+    "std_auc": 0.0468,
+    "mean_f1": 0.7283,
+    "std_f1": 0.0544,
+    "per_fold_auc": [
+      0.8025,
+      0.825,
+      0.8737,
+      0.7987,
+      0.7288
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 16,
+    "n_samples": 396
+  },
+  "17": {
+    "mean_auc": 0.8074,
+    "std_auc": 0.0348,
+    "mean_f1": 0.7346,
+    "std_f1": 0.038,
+    "per_fold_auc": [
+      0.7888,
+      0.8237,
+      0.8487,
+      0.8263,
+      0.7494
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 17,
+    "n_samples": 396
+  },
+  "18": {
+    "mean_auc": 0.8085,
+    "std_auc": 0.0292,
+    "mean_f1": 0.7377,
+    "std_f1": 0.0256,
+    "per_fold_auc": [
+      0.7888,
+      0.8474,
+      0.8103,
+      0.8308,
+      0.7654
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 18,
+    "n_samples": 396
+  },
+  "19": {
+    "mean_auc": 0.8042,
+    "std_auc": 0.0465,
+    "mean_f1": 0.7353,
+    "std_f1": 0.0434,
+    "per_fold_auc": [
+      0.7656,
+      0.8814,
+      0.8288,
+      0.7917,
+      0.7532
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 19,
+    "n_samples": 396
+  },
+  "20": {
+    "mean_auc": 0.7896,
+    "std_auc": 0.036,
+    "mean_f1": 0.7123,
+    "std_f1": 0.046,
+    "per_fold_auc": [
+      0.7469,
+      0.8186,
+      0.8327,
+      0.8026,
+      0.7474
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 20,
+    "n_samples": 396
+  },
+  "21": {
+    "mean_auc": 0.7832,
+    "std_auc": 0.0235,
+    "mean_f1": 0.6958,
+    "std_f1": 0.0147,
+    "per_fold_auc": [
+      0.7488,
+      0.7814,
+      0.816,
+      0.8006,
+      0.7692
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 21,
+    "n_samples": 396
+  },
+  "22": {
+    "mean_auc": 0.795,
+    "std_auc": 0.0397,
+    "mean_f1": 0.6816,
+    "std_f1": 0.0677,
+    "per_fold_auc": [
+      0.7325,
+      0.8026,
+      0.8571,
+      0.7865,
+      0.7962
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 22,
+    "n_samples": 396
+  },
+  "23": {
+    "mean_auc": 0.786,
+    "std_auc": 0.0411,
+    "mean_f1": 0.6836,
+    "std_f1": 0.0754,
+    "per_fold_auc": [
+      0.7288,
+      0.8019,
+      0.8526,
+      0.7821,
+      0.7647
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 23,
+    "n_samples": 396
+  },
+  "24": {
+    "mean_auc": 0.7838,
+    "std_auc": 0.0506,
+    "mean_f1": 0.7003,
+    "std_f1": 0.067,
+    "per_fold_auc": [
+      0.7081,
+      0.8346,
+      0.834,
+      0.8,
+      0.7423
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 24,
+    "n_samples": 396
+  },
+  "25": {
+    "mean_auc": 0.7821,
+    "std_auc": 0.0335,
+    "mean_f1": 0.6862,
+    "std_f1": 0.06,
+    "per_fold_auc": [
+      0.7331,
+      0.8263,
+      0.8122,
+      0.7737,
+      0.7654
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 25,
+    "n_samples": 396
+  },
+  "26": {
+    "mean_auc": 0.7863,
+    "std_auc": 0.0469,
+    "mean_f1": 0.6768,
+    "std_f1": 0.0651,
+    "per_fold_auc": [
+      0.7431,
+      0.8577,
+      0.8269,
+      0.7532,
+      0.7506
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 26,
+    "n_samples": 396
+  },
+  "27": {
+    "mean_auc": 0.7873,
+    "std_auc": 0.0434,
+    "mean_f1": 0.6882,
+    "std_f1": 0.0611,
+    "per_fold_auc": [
+      0.7462,
+      0.8513,
+      0.8276,
+      0.7596,
+      0.7519
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 27,
+    "n_samples": 396
+  },
+  "28": {
+    "mean_auc": 0.7692,
+    "std_auc": 0.0391,
+    "mean_f1": 0.6724,
+    "std_f1": 0.0423,
+    "per_fold_auc": [
+      0.7475,
+      0.8231,
+      0.8083,
+      0.7442,
+      0.7231
+    ],
+    "n_folds": 5,
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "layer": 28,
+    "n_samples": 396
+  }
+}
