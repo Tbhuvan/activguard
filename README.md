@@ -17,7 +17,7 @@
 
 ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes the model's own hidden-state activations to detect vulnerability signatures as they form in the residual stream.
 
-**Key result:** On a balanced benchmark of 198 vulnerability/safe code pairs across 13 CWE classes, ActivGuard achieves **100% recall with 0% false positives**, while Bandit and Semgrep achieve **0% recall**.
+**Key result:** On a curated static benchmark of 198 balanced vulnerability/safe code pairs across 13 CWE classes, ActivGuard achieves **AUC 0.835 with 0% false positives**, while Bandit and Semgrep achieve **0% recall**. Field testing on real LLM-generated code (44 prompts, CPU-only 1.5B model) shows 48.8% recall with 0% false positives and 54.6% mean token savings.
 
 ## How It Works
 
@@ -134,7 +134,7 @@ activguard/
 
 ## Research Context
 
-This project is part of a research programme on **runtime security for AI-assisted software development**, targeting the [RESIST](https://liu.se/en/research/resist) national center for cyber-resilient AI at Linköping University.
+This project is part of a research programme on **runtime security for AI-assisted software development** — specifically, whether LLM hidden-state activations can be used to detect vulnerability signatures before vulnerable code is emitted.
 
 **Related research artefacts:**
 - [RedBench](https://github.com/Tbhuvan/redbench) — Vulnerability benchmark dataset
