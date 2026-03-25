@@ -1,20 +1,36 @@
 """
 train_probe_auto.py — The file the agent edits to improve val_auc.
 
-Baseline: LogisticRegression on dolphin3:8b final-layer embeddings → AUC 0.644
-          LogisticRegression on CodeBERT layer-9 embeddings → AUC 0.900
-
-The agent should try to beat the best known val_auc.
+The agent should try to beat the best known val_auc (printed at startup
+from .activguard/layer_probe_weights.pkl — never hardcoded here).
 Everything in this file is fair game EXCEPT the final three lines
 (load_data, evaluate_auc, print_summary calls).
-
-Current best: 0.9001 (CodeBERT layer-9, LogisticRegression C=1.0)
 """
 
 from __future__ import annotations
 
+import pickle
 import sys
 from pathlib import Path
+
+
+def _current_best_auc() -> float:
+    """Read current best probe AUC from saved weights — no hardcoding."""
+    for candidate in (
+        Path(__file__).parent.parent / ".activguard" / "layer_probe_weights.pkl",
+        Path(".activguard/layer_probe_weights.pkl"),
+    ):
+        if candidate.exists():
+            try:
+                with open(candidate, "rb") as f:
+                    return float(pickle.load(f).get("auc_cv", 0.0))
+            except Exception:
+                pass
+    return 0.0
+
+
+_CURRENT_BEST = _current_best_auc()
+print(f"[autoresearch] Current best AUC to beat: {_CURRENT_BEST:.4f} (from layer_probe_weights.pkl)")
 
 import numpy as np
 from sklearn.decomposition import PCA

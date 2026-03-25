@@ -19,8 +19,9 @@ Why model-agnostic detection works:
     The vulnerability PATTERN (e.g. unsanitised string interpolation into SQL) is a
     property of the PARTIAL OUTPUT TEXT, not of which model generated it.  CodeBERT
     was pre-trained on 6 languages of code (CodeSearchNet) and its layer-9 hidden
-    state captures semantic code structure with AUC 0.900 on the redbench benchmark
-    (see layer_probe.py).  This representation is invariant to the generator model.
+    state captures semantic code structure on the redbench benchmark
+    (see layer_probe.py; current AUC loaded from .activguard/layer_probe_weights.pkl).
+    This representation is invariant to the generator model.
 
 Supported generators (must be running in Ollama):
     - dolphin3:8b          (uncensored, Llama3.1)
@@ -70,6 +71,31 @@ DEFAULT_PROBE_INTERVAL = 15   # probe every N tokens
 DEFAULT_MAX_TOKENS = 512
 
 
+def get_probe_auc(weights_path: str = DEFAULT_PROBE_WEIGHTS) -> float | None:
+    """Return the CV AUC of the saved CodeBERT probe, or None if not found.
+
+    Reads directly from the serialised probe weights — never hardcoded.
+
+    Args:
+        weights_path: Path to layer_probe_weights.pkl.
+
+    Returns:
+        float AUC or None if weights file does not exist.
+    """
+    for candidate in (
+        Path(weights_path),
+        Path(__file__).parent.parent / weights_path,
+    ):
+        if candidate.exists():
+            try:
+                with open(candidate, "rb") as f:
+                    payload = pickle.load(f)
+                return float(payload["auc_cv"])
+            except Exception:
+                return None
+    return None
+
+
 # ---------------------------------------------------------------------------
 # CodeBERT encoder (singleton — loaded once, reused for all calls)
 # ---------------------------------------------------------------------------
@@ -81,7 +107,8 @@ class _CodeBERTEncoder:
     Extracts layer-9 mean-pooled hidden state (768-dim) as the feature vector.
 
     Research note: Layer 9 of 12 (75% depth) is the maximally discriminative
-    layer for vulnerability detection — AUC 0.900 vs 0.644 for the final layer.
+    layer for vulnerability detection (see layer sweep in .activguard/layer_sweep_*.json
+    for current per-layer AUC values; loaded from .activguard/layer_probe_weights.pkl).
     This matches Zou et al.'s hypothesis that upper-middle layers carry strongest
     semantic signal before task-specific representations take over.
     """
