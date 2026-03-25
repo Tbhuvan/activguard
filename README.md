@@ -17,7 +17,7 @@
 
 ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes the model's own hidden-state activations to detect vulnerability signatures as they form in the residual stream.
 
-**Key result:** On a curated static benchmark of 198 balanced vulnerability/safe code pairs across 13 CWE classes, ActivGuard achieves **AUC 0.835 with 0% false positives**, while Bandit and Semgrep achieve **0% recall**. Field testing on real LLM-generated code (44 prompts, CPU-only 1.5B model) shows 48.8% recall with 0% false positives and 54.6% mean token savings.
+**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for both Bandit and Semgrep on the same streaming corpus. On complete static code fragments, Bandit detects 41.9% of samples at 27.3% FPR; Semgrep 0%. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
 
 ## How It Works
 
@@ -78,23 +78,27 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 
 ## Results
 
-### Static Benchmark (198 balanced pairs, 13 CWE classes)
+### Static Benchmark (198 balanced pairs, 8 CWE classes)
 
 | Tool | Recall | False Positives | AUC |
 |------|--------|-----------------|-----|
-| **ActivGuard** | **100%** | **0%** | **0.835** |
-| Bandit | 0% | 0% | — |
+| **ActivGuard** | **100%†** | **0%†** | **0.835** |
+| Bandit | 41.9% (83/198) | 27.3% FPR | — |
 | Semgrep | 0% | 0% | — |
 
-### Field Test (real-time HF generation, 44 prompts)
+†*In-sample evaluation — the same 198 pairs used for probe training. Held-out metric: AUC 0.835 ± 0.055 (5-fold CV).*
+
+### Field Test (live-generated streaming code, 44 prompts)
 
 | Metric | Value |
 |--------|-------|
-| Recall (actual vuln code) | 48.8% |
-| False Positives | 0% |
-| Mean Token Savings | 54.6% |
+| Recall (vulnerable prompts) | 58.3% (21/36) |
+| False Positive Rate (safe prompts) | 50% (4/8) |
+| Mean Token Savings | 57.4% |
+| Bandit recall (same corpus) | 0% |
+| Semgrep recall (same corpus) | 0% |
 
-*Field test conducted on CPU-only hardware with 1.5B parameter model. Recall gap is due to early intervention before vulnerability pattern fully forms — identifying the optimal intervention point is an active research question.*
+*Field test conducted on CPU-only hardware with 1.5B parameter model. Recall gap is due to early intervention before the vulnerability pattern is fully formed. The 50% FPR on safe prompts reflects probe sensitivity on ambiguous partial token sequences — identifying the detection-optimal layer and generation step to close both gaps is the core engineering challenge of RQ1.*
 
 ### Covered CWE Classes
 
