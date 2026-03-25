@@ -14,8 +14,8 @@ Approach A — Ollama Token Stream + Periodic Probe (implemented, works now):
 Approach B — HuggingFace Forward Hook (scaffolded, requires model download):
     1. Load HuggingFace model (e.g. cognitivecomputations/dolphin-2.9-llama3-8b).
     2. Register torch.nn.Module.register_forward_hook on layer[int(0.75 * n_layers)]
-       — the 75% depth layer identified as maximally discriminative (AUC 0.914,
-       see probe/layer_probe.py RQ1 result).
+       — the 75% depth layer identified as maximally discriminative
+       (see .activguard/layer_sweep_*.json for current per-layer AUC values).
     3. During model.generate(), the hook fires per token and captures the hidden state
        h ∈ R^(1, 4096) before the unembedding matrix maps it to vocabulary logits.
     4. Run the linear probe on h — if P(vulnerable) >= threshold, stop generation via

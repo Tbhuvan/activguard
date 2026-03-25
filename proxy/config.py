@@ -15,6 +15,31 @@ Configuration hierarchy (highest priority wins):
 from __future__ import annotations
 
 import os
+import pickle
+from pathlib import Path
+
+
+def get_probe_auc(weights_path: str | None = None) -> float | None:
+    """Return the CV AUC of the active probe from saved weights — never hardcoded.
+
+    Args:
+        weights_path: Path to .pkl file. Defaults to PROBE_WEIGHTS env var or
+                      .activguard/layer_probe_weights.pkl.
+
+    Returns:
+        float AUC or None if weights not found.
+    """
+    path = weights_path or os.environ.get(
+        "ACTIVGUARD_PROBE_WEIGHTS", ".activguard/layer_probe_weights.pkl"
+    )
+    for candidate in (Path(path), Path(__file__).parent.parent / path):
+        if candidate.exists():
+            try:
+                with open(candidate, "rb") as f:
+                    return float(pickle.load(f).get("auc_cv", 0.0))
+            except Exception:
+                return None
+    return None
 
 # ---------------------------------------------------------------------------
 # Ollama backend
@@ -37,7 +62,8 @@ THRESHOLD: float = float(os.environ.get("ACTIVGUARD_THRESHOLD", "0.55"))
 """P(vulnerable) decision boundary.  Values >= THRESHOLD raise a VIOLATION.
 
 Lower values increase recall at the cost of precision.  The default 0.55 was
-selected to match the CodeBERT layer-9 probe AUC 0.914 operating point.
+selected empirically against the CodeBERT layer-9 probe (current AUC loaded
+at runtime from .activguard/layer_probe_weights.pkl via get_probe_auc()).
 
 Reference: Feng et al., "CodeBERT", arXiv:2002.08155 (2020).
 """
