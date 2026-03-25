@@ -2,13 +2,13 @@
 train_probe_auto.py — The file the agent edits to improve val_auc.
 
 Baseline: LogisticRegression on dolphin3:8b final-layer embeddings → AUC 0.644
-          LogisticRegression on CodeBERT layer-9 embeddings → AUC 0.914
+          LogisticRegression on CodeBERT layer-9 embeddings → AUC 0.900
 
 The agent should try to beat the best known val_auc.
 Everything in this file is fair game EXCEPT the final three lines
 (load_data, evaluate_auc, print_summary calls).
 
-Current best: 0.9140 (CodeBERT layer-9, LogisticRegression C=1.0)
+Current best: 0.9001 (CodeBERT layer-9, LogisticRegression C=1.0)
 """
 
 from __future__ import annotations

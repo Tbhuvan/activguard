@@ -19,7 +19,7 @@ Why model-agnostic detection works:
     The vulnerability PATTERN (e.g. unsanitised string interpolation into SQL) is a
     property of the PARTIAL OUTPUT TEXT, not of which model generated it.  CodeBERT
     was pre-trained on 6 languages of code (CodeSearchNet) and its layer-9 hidden
-    state captures semantic code structure with AUC 0.914 on the redbench benchmark
+    state captures semantic code structure with AUC 0.900 on the redbench benchmark
     (see layer_probe.py).  This representation is invariant to the generator model.
 
 Supported generators (must be running in Ollama):
@@ -81,7 +81,7 @@ class _CodeBERTEncoder:
     Extracts layer-9 mean-pooled hidden state (768-dim) as the feature vector.
 
     Research note: Layer 9 of 12 (75% depth) is the maximally discriminative
-    layer for vulnerability detection — AUC 0.914 vs 0.644 for the final layer.
+    layer for vulnerability detection — AUC 0.900 vs 0.644 for the final layer.
     This matches Zou et al.'s hypothesis that upper-middle layers carry strongest
     semantic signal before task-specific representations take over.
     """

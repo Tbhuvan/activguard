@@ -218,6 +218,73 @@ def per_class_metrics(
 
 
 # ---------------------------------------------------------------------------
+# Probe metric loaders — read real results instead of hardcoding
+# ---------------------------------------------------------------------------
+
+def _load_hf_probe_metrics() -> dict[str, Any]:
+    """Load latest HF probe training metrics from experiments.json.
+
+    Returns the most recent hf_hidden_probe_training entry trained on 8 CWE
+    classes (the production probe).  Returns empty dict if not found.
+    """
+    for candidate in (
+        Path("experiments.json"),
+        Path(__file__).parent / "experiments.json",
+    ):
+        if candidate.exists():
+            exp_path = candidate
+            break
+    else:
+        return {}
+
+    try:
+        with open(exp_path, encoding="utf-8") as f:
+            experiments = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+    entries = [
+        r for r in experiments
+        if r.get("experiment") == "hf_hidden_probe_training"
+        and r.get("n_classes", 0) == 8
+    ]
+    if not entries:
+        return {}
+
+    latest = entries[-1]
+    return {
+        "model":      latest.get("model", "unknown"),
+        "auc":        latest.get("mean_auc", 0.0),
+        "std_auc":    latest.get("std_auc", 0.0),
+        "f1":         latest.get("mean_f1", 0.0),
+        "n_samples":  latest.get("n_vuln", 0),
+        "n_classes":  latest.get("n_classes", 0),
+        "timestamp":  latest.get("timestamp", ""),
+    }
+
+
+def _load_codebert_auc() -> float:
+    """Load CodeBERT probe CV AUC from saved layer_probe_weights.pkl."""
+    for candidate in (
+        Path(".activguard/layer_probe_weights.pkl"),
+        Path(__file__).parent / ".activguard/layer_probe_weights.pkl",
+    ):
+        if candidate.exists():
+            pkl_path = candidate
+            break
+    else:
+        return 0.0
+
+    try:
+        import pickle
+        with open(pkl_path, "rb") as f:
+            payload = pickle.load(f)
+        return float(payload.get("auc_cv", 0.0))
+    except Exception:
+        return 0.0
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -285,19 +352,36 @@ def main() -> None:
             bar = "#" * int(m["recall"] * 20)
             print(f"    {vc:<20} {m['recall']:.2f}  [{bar:<20}]  ({m['tp']}/{m['n']})")
 
-    # Summary comparison table
+    # Summary comparison table — probe metrics loaded from saved results
     if len(all_results) > 1:
+        hf_metrics = _load_hf_probe_metrics()
+        cb_auc     = _load_codebert_auc()
+
+        header = "Comparison vs Activation Probe"
+        if hf_metrics:
+            header += (
+                f" (HF AUC {hf_metrics['auc']:.3f}"
+                f"+-{hf_metrics['std_auc']:.3f}"
+                f", n={hf_metrics['n_samples']}"
+                f", {hf_metrics['n_classes']} classes)"
+            )
+
         print(f"\n{'='*60}")
-        print(f"  Comparison vs Activation Probe (AUC 0.900 / Acc 0.840)")
+        print(f"  {header}")
         print(f"{'='*60}")
-        print(f"  {'Method':<28} {'Prec':<8} {'Recall':<8} {'F1':<8} {'Note'}")
-        print(f"  {'-'*60}")
+        print(f"  {'Method':<34} {'Prec':<8} {'Recall':<8} {'F1':<8} {'Note'}")
+        print(f"  {'-'*66}")
         for tool_name, results in all_results.items():
             m = compute_metrics(results)
             note = "runs AFTER code written" if tool_name in ("bandit", "semgrep") else ""
-            print(f"  {tool_name.capitalize():<28} {m['precision']:<8.3f} {m['recall']:<8.3f} {m['f1']:<8.3f} {note}")
-        print(f"  {'CodeBERT probe (CV AUC=0.900)':<28} {'—':<8} {'—':<8} {'—':<8} runs DURING generation")
-        print(f"  {'Streaming probe (P=0.95 demo)':<28} {'—':<8} {'—':<8} {'—':<8} flags at token 255/305")
+            print(f"  {tool_name.capitalize():<34} {m['precision']:<8.3f} {m['recall']:<8.3f} {m['f1']:<8.3f} {note}")
+        if hf_metrics:
+            slug = hf_metrics["model"].split("/")[-1]
+            hf_label = f"HF probe ({slug}, AUC={hf_metrics['auc']:.3f})"
+            print(f"  {hf_label:<34} {'—':<8} {'—':<8} {'—':<8} runs DURING generation")
+        if cb_auc > 0:
+            cb_label = f"CodeBERT probe (AUC={cb_auc:.3f})"
+            print(f"  {cb_label:<34} {'—':<8} {'—':<8} {'—':<8} runs DURING generation")
         print(f"{'='*60}")
 
     if args.out:
