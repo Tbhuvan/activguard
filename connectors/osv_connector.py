@@ -383,14 +383,8 @@ class OSVConnector(ACPConnector):
             # Prefer CVE ID as the indicator ID if available.
             indicator_id = cve_alias or osv_id
 
-            # ---- Timestamp ----
-            published_str: str = vuln.get("published", "")
-            try:
-                timestamp = datetime.fromisoformat(
-                    published_str.replace("Z", "+00:00")
-                )
-            except (ValueError, AttributeError):
-                timestamp = datetime.now(tz=timezone.utc)
+            # ---- Fetch timestamp (use now, not OSV publish date, so TTL is from ingestion) ----
+            timestamp = datetime.now(tz=timezone.utc)
 
             # ---- Code patterns ----
             affected_patterns = self._build_affected_patterns(cwe_ids, description)

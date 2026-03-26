@@ -394,14 +394,8 @@ class NVDConnector(ACPConnector):
             # ---- Semantic rule ----
             semantic_rule = self._build_semantic_rule(cve_id, cwe_ids, description)
 
-            # ---- Published timestamp ----
-            pub_date_str: str = cve.get("published", "")
-            try:
-                timestamp = datetime.fromisoformat(
-                    pub_date_str.replace("Z", "+00:00")
-                )
-            except (ValueError, AttributeError):
-                timestamp = datetime.now(tz=timezone.utc)
+            # ---- Fetch timestamp (use now, not CVE publish date, so TTL is from ingestion) ----
+            timestamp = datetime.now(tz=timezone.utc)
 
             return ThreatIndicator(
                 id=cve_id,

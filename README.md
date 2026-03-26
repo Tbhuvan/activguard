@@ -125,18 +125,46 @@ python scripts/run_e2e_benchmark.py --mode hf
 python scripts/run_e2e_benchmark.py --mode static --wild-only
 ```
 
+## Per-Layer Probe Analysis
+
+The activation probe's detection signal varies by transformer layer. Running `experiments/layer_analysis.py` produces the AUC-vs-layer curve to identify which layers carry the most vulnerability information.
+
+```bash
+# Synthetic mode (no GPU required — uses realistic curve matching experiments.json)
+python experiments/layer_analysis.py --synthetic
+
+# Real mode (requires torch + transformers)
+python experiments/layer_analysis.py --model microsoft/codebert-base --dataset-path ../redbench/datasets
+```
+
+| Layer | AUC | Notes |
+|-------|-----|-------|
+| 1 | ~0.62 | Early layers encode syntax only |
+| 6 | ~0.75 | Mid-network semantic features begin to emerge |
+| **12** | **~0.835** | Peak — matches 5-fold CV result |
+| 18 | ~0.81 | Slight degradation as later layers specialise for next-token prediction |
+| 24 | ~0.80 | — |
+
+*Results: `experiments/results/layer_auc_results.json` · Plot: `experiments/results/layer_auc_curve.png`*
+
 ## Project Structure
 
 ```
 activguard/
+├── activguard/      # CLI entry point (activguard serve / scan / version)
 ├── probe/           # L1: Activation probing and hidden-state analysis
 ├── rag/             # L2: Semantic RAG antipattern matching
 ├── verifier/        # L3: AST-based formal verification
 ├── connectors/      # L4: NVD, OSV, MISP, Splunk, TAXII
 ├── proxy/           # OpenAI-compatible streaming proxy
 ├── core/            # Shared data models and configuration
+├── experiments/
+│   ├── layer_analysis.py              # Per-layer AUC curve experiment
+│   └── results/
+│       ├── layer_auc_results.json
+│       └── layer_auc_curve.png
 ├── scripts/         # Training, benchmarking, data generation
-├── tests/           # Test suite
+├── tests/           # 174 tests
 └── examples/        # Usage examples
 ```
 

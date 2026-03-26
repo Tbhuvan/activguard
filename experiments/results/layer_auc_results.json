@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-03-26T02:43:54.199105",
+  "experiment": "layer_auc_analysis",
+  "model": "N/A",
+  "dataset_path": "C:\\Users\\bhuvan\\projects\\redbench\\datasets",
+  "layers": [
+    1,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    24
+  ],
+  "synthetic": true,
+  "elapsed_s": 0.01,
+  "results": [
+    {
+      "layer": 1,
+      "auc": 0.6432,
+      "f1": 0.5676,
+      "precision": 0.5492,
+      "recall": 0.5381,
+      "synthetic": true
+    },
+    {
+      "layer": 3,
+      "auc": 0.6609,
+      "f1": 0.5793,
+      "precision": 0.5794,
+      "recall": 0.5438,
+      "synthetic": true
+    },
+    {
+      "layer": 6,
+      "auc": 0.7174,
+      "f1": 0.6118,
+      "precision": 0.6425,
+      "recall": 0.5772,
+      "synthetic": true
+    },
+    {
+      "layer": 9,
+      "auc": 0.7828,
+      "f1": 0.6677,
+      "precision": 0.7058,
+      "recall": 0.6782,
+      "synthetic": true
+    },
+    {
+      "layer": 12,
+      "auc": 0.83,
+      "f1": 0.7339,
+      "precision": 0.7208,
+      "recall": 0.7058,
+      "synthetic": true
+    },
+    {
+      "layer": 15,
+      "auc": 0.8228,
+      "f1": 0.702,
+      "precision": 0.7433,
+      "recall": 0.7022,
+      "synthetic": true
+    },
+    {
+      "layer": 18,
+      "auc": 0.8384,
+      "f1": 0.7265,
+      "precision": 0.7749,
+      "recall": 0.6479,
+      "synthetic": true
+    },
+    {
+      "layer": 21,
+      "auc": 0.8095,
+      "f1": 0.7039,
+      "precision": 0.7182,
+      "recall": 0.6961,
+      "synthetic": true
+    },
+    {
+      "layer": 24,
+      "auc": 0.8029,
+      "f1": 0.7092,
+      "precision": 0.7393,
+      "recall": 0.658,
+      "synthetic": true
+    }
+  ],
+  "best_layer": 18,
+  "best_auc": 0.8384
+}
