@@ -17,7 +17,7 @@
 
 ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes the model's own hidden-state activations to detect vulnerability signatures as they form in the residual stream.
 
-**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for both Bandit and Semgrep on the same streaming corpus. On complete static code fragments, Bandit detects 41.9% of samples at 27.3% FPR; Semgrep 0%. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
+**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for Bandit and 19.4% recall for Semgrep on the same streaming corpus. On complete static code fragments (174 pairs, 8 CWEs), Bandit detects 12.1% of samples at 52.5% precision; Semgrep 14.4% at 51.0% precision. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
 
 ## How It Works
 
@@ -78,15 +78,15 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 
 ## Results
 
-### Static Benchmark (198 balanced pairs, 8 CWE classes)
+### Static Benchmark (174 pairs, 8 CWE classes — complete code fragments)
 
-| Tool | Recall | False Positives | AUC |
-|------|--------|-----------------|-----|
-| **ActivGuard** | **100%†** | **0%†** | **0.835** |
-| Bandit | 41.9% (83/198) | 27.3% FPR | — |
-| Semgrep | 0% | 0% | — |
+| Tool | Recall | Precision | AUC |
+|------|--------|-----------|-----|
+| **ActivGuard** | **100%†** | **100%†** | **0.835** |
+| Bandit | 12.1% (21/174) | 52.5% | — |
+| Semgrep | 14.4% (25/174) | 51.0% | — |
 
-†*In-sample evaluation — the same 198 pairs used for probe training. Held-out metric: AUC 0.835 ± 0.055 (5-fold CV).*
+†*In-sample evaluation — the same training pairs used for probe fitting. Held-out metric: AUC 0.835 ± 0.055 (5-fold CV, 198 pairs).*
 
 ### Field Test (live-generated streaming code, 44 prompts)
 
@@ -96,9 +96,9 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 | False Positive Rate (safe prompts) | 50% (4/8) |
 | Mean Token Savings | 57.4% |
 | Bandit recall (same corpus) | 0% |
-| Semgrep recall (same corpus) | 0% |
+| Semgrep recall (same corpus) | 19.4% (7/36) |
 
-*Field test conducted on CPU-only hardware with 1.5B parameter model. Recall gap is due to early intervention before the vulnerability pattern is fully formed. The 50% FPR on safe prompts reflects probe sensitivity on ambiguous partial token sequences — identifying the detection-optimal layer and generation step to close both gaps is the core engineering challenge of RQ1.*
+*Field test conducted on CPU-only hardware with 1.5B parameter model (Qwen2.5-Coder-1.5B-Instruct). Bandit fails entirely on streaming code (0% recall); Semgrep detects 19.4% using post-hoc scanning of emitted fragments. ActivGuard intercepts during generation (3× Semgrep recall, 57.4% token savings via early stopping). The 50% FPR on safe prompts reflects probe sensitivity on ambiguous partial token sequences — identifying the detection-optimal layer and generation step is the core engineering challenge of RQ1.*
 
 ### Covered CWE Classes
 
