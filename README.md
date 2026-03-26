@@ -17,7 +17,7 @@
 
 ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes the model's own hidden-state activations to detect vulnerability signatures as they form in the residual stream.
 
-**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for Bandit and 19.4% recall for Semgrep on the same streaming corpus. On complete static code fragments (174 pairs, 8 CWEs), Bandit detects 12.1% of samples at 52.5% precision; Semgrep 14.4% at 51.0% precision. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
+**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for Bandit and 19.4% recall for Semgrep on the same streaming corpus. On complete static code fragments (174 pairs, 8 CWEs), Bandit detects 47.7% at MEDIUM severity (standard CI/CD setting); Semgrep 14.4% — limited by taint-tracking rules that require full application context. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
 
 ## How It Works
 
@@ -83,10 +83,10 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 | Tool | Recall | Precision | AUC |
 |------|--------|-----------|-----|
 | **ActivGuard** | **100%†** | **100%†** | **0.835** |
-| Bandit | 12.1% (21/174) | 52.5% | — |
-| Semgrep | 14.4% (25/174) | 51.0% | — |
+| Bandit (≥MEDIUM) | 47.7% (83/174) | 60.6% | — |
+| Semgrep (p/python) | 14.4% (25/174) | 51.0% | — |
 
-†*In-sample evaluation — the same training pairs used for probe fitting. Held-out metric: AUC 0.835 ± 0.055 (5-fold CV, 198 pairs).*
+†*In-sample evaluation — the same training pairs used for probe fitting. Held-out metric: AUC 0.835 ± 0.055 (5-fold CV, 198 pairs). Bandit threshold: MEDIUM (standard CI/CD setting); HIGH misses B608/SQLi entirely. Semgrep recall is limited by taint-flow rules requiring full application context — isolated snippets break the taint chain.*
 
 ### Field Test (live-generated streaming code, 44 prompts)
 

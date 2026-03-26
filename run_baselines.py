@@ -34,7 +34,9 @@ from pathlib import Path
 from typing import Any
 
 REDBENCH_DEFAULT = "../redbench/datasets"
-SEVERITY_DEFAULT = "HIGH"   # Bandit severity threshold
+SEVERITY_DEFAULT = "MEDIUM"  # Bandit severity threshold — MEDIUM is standard CI/CD usage;
+                              # HIGH misses B608 (SQLi) and B310/B113 (SSRF) which Bandit
+                              # always marks MEDIUM due to missing taint analysis.
 
 
 # ---------------------------------------------------------------------------
