@@ -102,7 +102,11 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 
 ### Covered CWE Classes
 
-SQL Injection (CWE-89) · Command Injection (CWE-78) · Path Traversal (CWE-22) · XSS (CWE-79) · SSRF (CWE-918) · IDOR (CWE-639) · Auth Bypass (CWE-306) · Deserialization (CWE-502) · Open Redirect (CWE-601) · ReDoS (CWE-1333) · Unsafe YAML (CWE-20) · TLS Validation (CWE-295) · XXE (CWE-611)
+The activation probe has been trained and evaluated on **8 CWE classes** (5-fold CV, 198 pairs):
+
+SQL Injection (CWE-89) · Command Injection (CWE-78) · Path Traversal (CWE-22) · XSS (CWE-79) · SSRF (CWE-918) · IDOR (CWE-639) · Auth Bypass (CWE-306) · Deserialization (CWE-502)
+
+The full RedBench dataset additionally covers: Open Redirect (CWE-601) · ReDoS (CWE-1333) · Unsafe YAML (CWE-20) · TLS Validation (CWE-295) · XXE (CWE-611)
 
 ## Quick Start
 
