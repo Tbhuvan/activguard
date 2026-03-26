@@ -15,9 +15,14 @@
 
 ## Overview
 
-ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes the model's own hidden-state activations to detect vulnerability signatures as they form in the residual stream.
+ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes transformer hidden-state activations to detect vulnerability signatures as they form in the residual stream.
 
-**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for Bandit and 19.4% recall for Semgrep on the same streaming corpus. On complete static code fragments (198 pairs, 8 CWEs), Bandit detects 41.9% at MEDIUM severity (standard CI/CD setting); Semgrep ~14% — limited by taint-tracking rules that require full application context. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
+Two deployment modes:
+
+- **Direct HF mode** — the generating model (e.g., Qwen2.5-Coder) is loaded via HuggingFace Transformers; the probe reads layer *l*'s residual stream directly during generation. All field test results are from this mode.
+- **Proxy mode** — an OpenAI-compatible proxy intercepts the token stream from any Ollama backend; a locally-loaded probe model re-processes the accumulated tokens to extract hidden states. No access to the generating model's internals required.
+
+**Key result:** Activation probe AUC **0.835 ± 0.055** (5-fold CV, 198 balanced pairs, 8 CWE classes). On live-generated streaming code (44 prompts, direct HF mode, CPU-only 1.5B model), ActivGuard achieves **58.3% recall** with 57.4% mean token savings — against 0% recall for Bandit and 19.4% recall for Semgrep on the same streaming corpus. On complete static code fragments (198 pairs, 8 CWEs), Bandit detects 41.9% at MEDIUM severity (standard CI/CD setting); Semgrep ~14% — limited by taint-tracking rules that require full application context. Primary open problem: 50% FPR on safe partial token sequences during streaming — the core engineering challenge of RQ1.
 
 ## How It Works
 
@@ -47,14 +52,27 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 
 ## Architecture
 
+### Direct HF Mode (field test results)
+```
+Developer prompt → Qwen2.5-Coder (HuggingFace, local)
+                         ↓  generates token-by-token
+              ActivGuard reads layer 12 residual stream h_l^(t)
+                         ↓
+              Probe scores: P(vuln) = σ(w·h + b)
+                         ↓
+              P(vuln) > τ for k steps → STOP generation
+```
+
+### Proxy Mode (any Ollama backend)
 ```
 ┌─────────────────────────────────────────────────┐
 │                  ActivGuard Proxy                │
 │            (OpenAI-compatible API)               │
 ├─────────────────────────────────────────────────┤
 │                                                  │
-│  L1  Activation Probe    ← hidden-state probing │
-│      ↓ flagged?                                  │
+│  L1  Activation Probe    ← probe re-processes   │
+│                             accumulated tokens   │
+│      ↓ flagged?             via local HF model  │
 │  L2  Semantic RAG        ← antipattern matching │
 │      ↓ flagged?                                  │
 │  L3  Formal Verification ← AST rule checking   │
@@ -64,11 +82,11 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 ├─────────────────────────────────────────────────┤
 │  Client (VS Code / Cursor / any OpenAI client)  │
 │          ↕ streams tokens via SSE                │
-│  Backend (Ollama / HuggingFace / any LLM)       │
+│  Backend (Ollama / any black-box LLM)           │
 └─────────────────────────────────────────────────┘
 ```
 
-**Layer 1 — Activation Probe:** Linear classifier on hidden states from transformer layer *l* at generation step *t*. Trained on balanced vulnerable/safe code pairs. Fires when P(vuln) > τ for *k* consecutive steps.
+**Layer 1 — Activation Probe:** Linear classifier on hidden states from transformer layer *l* at generation step *t*. In direct HF mode, reads the generating model's own residual stream. In proxy mode, re-processes the accumulated token buffer through a locally-loaded probe model. Fires when P(vuln) > τ for *k* consecutive steps.
 
 **Layer 2 — Semantic RAG:** Vector similarity search against curated vulnerability antipattern database. Provides pattern-level context when probe confidence is ambiguous.
 
@@ -100,7 +118,7 @@ The probe fires at step 255. The vulnerable f-string at step 305 never exists.
 | Bandit recall (same corpus) | 0% |
 | Semgrep recall (same corpus) | 19.4% (7/36) |
 
-*Field test conducted on CPU-only hardware with 1.5B parameter model (Qwen2.5-Coder-1.5B-Instruct). Bandit fails entirely on streaming code (0% recall); Semgrep detects 19.4% using post-hoc scanning of emitted fragments. ActivGuard intercepts during generation (3× Semgrep recall, 57.4% token savings via early stopping). The 50% FPR on safe prompts reflects probe sensitivity on ambiguous partial token sequences — identifying the detection-optimal layer and generation step is the core engineering challenge of RQ1.*
+*Field test conducted in **direct HF mode** — Qwen2.5-Coder-1.5B-Instruct loaded locally via HuggingFace Transformers on CPU-only hardware; the probe reads the generating model's own layer-12 residual stream during generation. Bandit fails entirely on streaming code (0% recall); Semgrep detects 19.4% using post-hoc scanning of emitted fragments. ActivGuard intercepts during generation (3× Semgrep recall, 57.4% token savings via early stopping). The 50% FPR on safe prompts reflects probe sensitivity on ambiguous partial token sequences — identifying the detection-optimal layer and generation step is the core engineering challenge of RQ1.*
 
 ### Covered CWE Classes
 
