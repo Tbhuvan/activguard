@@ -41,7 +41,6 @@ SUPPORTED_MODELS: list[str] = [
     # API models (require API key environment variables)
     "gpt-4",          # requires OPENAI_API_KEY
     "gpt-3.5-turbo",  # requires OPENAI_API_KEY
-    "claude-3-sonnet-20240229",  # requires ANTHROPIC_API_KEY
 ]
 
 # Vulnerability classes to evaluate.

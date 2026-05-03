@@ -17,6 +17,8 @@
 
 ActivGuard is a multi-layer runtime security system that detects vulnerable code **during** LLM generation — before it reaches the developer. Unlike static analysis tools (Bandit, Semgrep) that pattern-match finished code, ActivGuard probes transformer hidden-state activations to detect vulnerability signatures as they form in the residual stream.
 
+Recent activation-level security results strengthen this design: Kulkarni's *Latent Adversarial Detection* (arXiv:2604.28129) shows that multi-turn attacks leave measurable residual-stream trajectory signatures, termed **adversarial restlessness**. ActivGuard applies the same core premise to code generation: vulnerability formation should be visible in hidden-state dynamics before the vulnerable line is complete.
+
 Two deployment modes:
 
 - **Direct HF mode** — the generating model (e.g., Qwen2.5-Coder) is loaded via HuggingFace Transformers; the probe reads layer *l*'s residual stream directly during generation. All field test results are from this mode.
@@ -87,6 +89,8 @@ Developer prompt → Qwen2.5-Coder (HuggingFace, local)
 ```
 
 **Layer 1 — Activation Probe:** Linear classifier on hidden states from transformer layer *l* at generation step *t*. In direct HF mode, reads the generating model's own residual stream. In proxy mode, re-processes the accumulated token buffer through a locally-loaded probe model. Fires when P(vuln) > τ for *k* consecutive steps.
+
+Effective-rank diagnostics now follow Lan et al. (arXiv:2604.27019): during cross-validation, ActivGuard records the entropy effective rank and stable rank of learned probe directions. Low rank would support the publishable claim that vulnerability signatures are low-dimensional in residual space; high rank would falsify that claim and point toward class-specific or layer-specific detectors.
 
 **Layer 2 — Semantic RAG:** Vector similarity search against curated vulnerability antipattern database. Provides pattern-level context when probe confidence is ambiguous.
 
@@ -191,6 +195,10 @@ activguard/
 ## Research Context
 
 This project is part of a research programme on **runtime security for AI-assisted software development** — specifically, whether LLM hidden-state activations can be used to detect vulnerability signatures before vulnerable code is emitted.
+
+**Primary methodological citations:**
+- Prashant Kulkarni, *Latent Adversarial Detection: Adaptive Probing of LLM Activations for Multi-Turn Attack Detection*, arXiv:2604.28129 (2026). Establishes "adversarial restlessness" as a residual-stream trajectory signal for covert attacks.
+- Wenhao Lan, Shan Li, Junbin Yang, Haihua Shen, Yijun Yang, *Dynamic Adversarial Fine-Tuning Reorganizes Refusal Geometry*, arXiv:2604.27019 (2026). Provides the effective-rank methodology ActivGuard uses to test whether learned safety/security directions are low-dimensional.
 
 **Related research artefacts:**
 - [RedBench](https://github.com/Tbhuvan/redbench) — Vulnerability benchmark dataset

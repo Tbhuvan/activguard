@@ -23,6 +23,8 @@ Outputs:
 Research context:
     Addresses RQ1 (layer sensitivity) and RQ4 (precision/recall tradeoff).
     The trained probe is wired into the proxy as the true L1 layer.
+    Effective-rank diagnostics follow arXiv:2604.27019 to test whether
+    vulnerability signatures occupy a low-dimensional residual-stream subspace.
 """
 
 from __future__ import annotations
@@ -201,7 +203,7 @@ def run_layer_sweep(
 def log_experiment(record: dict) -> None:
     """Append an experiment record to experiments.json.
 
-    Format aligns with the research rules in CLAUDE.md.
+    Format aligns with the local research logging convention.
     """
     exp_path = Path(EXPERIMENTS_FILE)
     experiments: list[dict] = []
@@ -358,6 +360,12 @@ def main() -> None:
     logger.info("\nCross-validation results (%d folds):", args.n_splits)
     logger.info("  AUC:  %.3f ± %.3f", metrics["mean_auc"], metrics["std_auc"])
     logger.info("  F1:   %.3f ± %.3f", metrics["mean_f1"], metrics["std_f1"])
+    logger.info("  Effective rank: %.3f", metrics["mean_effective_rank"])
+    if metrics.get("cv_direction_effective_rank"):
+        logger.info(
+            "  CV direction effective rank: %.3f",
+            metrics["cv_direction_effective_rank"],
+        )
     logger.info("  Per-fold AUC: %s", metrics["per_fold_auc"])
 
     # Save probe
@@ -383,6 +391,10 @@ def main() -> None:
         "mean_f1": metrics["mean_f1"],
         "std_f1": metrics["std_f1"],
         "per_fold_auc": metrics["per_fold_auc"],
+        "mean_effective_rank": metrics["mean_effective_rank"],
+        "per_fold_effective_rank": metrics["per_fold_effective_rank"],
+        "cv_direction_effective_rank": metrics["cv_direction_effective_rank"],
+        "cv_direction_stable_rank": metrics["cv_direction_stable_rank"],
         "encode_time_s": round(encode_time, 1),
         "weights_path": save_path,
     }
@@ -394,6 +406,7 @@ def main() -> None:
     print(f"  Layer:   {best_layer}")
     print(f"  AUC:     {metrics['mean_auc']:.3f} +/- {metrics['std_auc']:.3f}")
     print(f"  F1:      {metrics['mean_f1']:.3f} +/- {metrics['std_f1']:.3f}")
+    print(f"  EffRank: {metrics['mean_effective_rank']:.3f}")
     print(f"  Samples: {n_total} vuln + {n_total} safe")
     print(f"  Weights: {save_path}")
     print("=" * 60)

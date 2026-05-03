@@ -44,6 +44,10 @@ Reference: Zou et al., "Representation Engineering: A Top-Down Approach to
 AI Transparency", arXiv:2310.01405 (2023).
 Reference: Feng et al., "CodeBERT: A Pre-Trained Model for Programming and
 Natural Languages", arXiv:2002.08155 (2020).
+Reference: Kulkarni, "Latent Adversarial Detection: Adaptive Probing of LLM
+Activations for Multi-Turn Attack Detection", arXiv:2604.28129 (2026).
+Reference: Lan et al., "Dynamic Adversarial Fine-Tuning Reorganizes Refusal
+Geometry", arXiv:2604.27019 (2026).
 """
 
 from __future__ import annotations
@@ -211,6 +215,35 @@ DEFAULT_MAX_TOKENS = 512
 def _slug(model_name: str) -> str:
     """Convert 'Qwen/Qwen2.5-Coder-1.5B-Instruct' → 'qwen2-5-coder-1-5b'."""
     return model_name.lower().split("/")[-1].replace(".", "-").replace("_", "-")
+
+
+def _effective_rank_metrics(matrix: np.ndarray) -> dict[str, float]:
+    """Return entropy effective-rank diagnostics for a probe weight matrix.
+
+    Effective rank is exp(entropy(normalized singular values)).  It is useful
+    here because a low value means the probe's vulnerability signal occupies a
+    small residual-stream subspace, matching the refusal-geometry protocol in
+    arXiv:2604.27019.
+    """
+    m = np.asarray(matrix, dtype=np.float64)
+    if m.ndim == 1:
+        m = m.reshape(1, -1)
+    if m.size == 0:
+        return {"effective_rank": 0.0, "stable_rank": 0.0, "spectral_rank": 0.0}
+
+    singular_values = np.linalg.svd(m, compute_uv=False)
+    singular_values = singular_values[singular_values > 1e-12]
+    if singular_values.size == 0:
+        return {"effective_rank": 0.0, "stable_rank": 0.0, "spectral_rank": 0.0}
+
+    probs = singular_values / singular_values.sum()
+    entropy = -float(np.sum(probs * np.log(probs)))
+    stable_rank = float(np.sum(singular_values ** 2) / (singular_values[0] ** 2))
+    return {
+        "effective_rank": round(float(np.exp(entropy)), 4),
+        "stable_rank": round(stable_rank, 4),
+        "spectral_rank": float(singular_values.size),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -570,6 +603,8 @@ class HFHiddenProbe:
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
         aucs: list[float] = []
         f1s: list[float] = []
+        fold_rank_metrics: list[dict[str, float]] = []
+        fold_directions: list[np.ndarray] = []
         X_f = X.astype(np.float32)
         y_f = y.astype(np.float32)
 
@@ -584,6 +619,8 @@ class HFHiddenProbe:
                     probs = torch.sigmoid(
                         fold_mlp(torch.tensor(X_te))
                     ).numpy()
+                first_linear = fold_mlp.net[1].weight.detach().cpu().numpy()
+                fold_rank_metrics.append(_effective_rank_metrics(first_linear))
             else:
                 from sklearn.linear_model import LogisticRegression
                 from sklearn.preprocessing import StandardScaler
@@ -597,6 +634,9 @@ class HFHiddenProbe:
                 )
                 clf.fit(X_tr_s, y_tr)
                 probs = clf.predict_proba(X_te_s)[:, 1]
+                input_space_direction = clf.coef_[0] / np.maximum(scaler.scale_, 1e-12)
+                fold_directions.append(input_space_direction)
+                fold_rank_metrics.append(_effective_rank_metrics(input_space_direction))
 
             preds = (probs >= self.threshold).astype(int)
 
@@ -610,12 +650,27 @@ class HFHiddenProbe:
         # Fit final model on full data
         self.fit(X_f, y_f)
 
+        cv_direction_rank = (
+            _effective_rank_metrics(np.vstack(fold_directions))
+            if fold_directions
+            else {}
+        )
+
         return {
             "mean_auc":  round(float(np.mean(aucs)), 4),
             "std_auc":   round(float(np.std(aucs)),  4),
             "mean_f1":   round(float(np.mean(f1s)),  4),
             "std_f1":    round(float(np.std(f1s)),   4),
             "per_fold_auc": [round(a, 4) for a in aucs],
+            "per_fold_effective_rank": [
+                m["effective_rank"] for m in fold_rank_metrics
+            ],
+            "mean_effective_rank": round(
+                float(np.mean([m["effective_rank"] for m in fold_rank_metrics])),
+                4,
+            ) if fold_rank_metrics else 0.0,
+            "cv_direction_effective_rank": cv_direction_rank.get("effective_rank", 0.0),
+            "cv_direction_stable_rank": cv_direction_rank.get("stable_rank", 0.0),
             "n_folds": n_splits,
             "model": self.model_name,
             "layer": self.layer,
@@ -995,9 +1050,18 @@ class HFHiddenProbe:
         if self._mlp is not None:
             n_params = sum(p.numel() for p in self._mlp.parameters())
             stats["mlp_params"] = n_params
+            first_linear = self._mlp.net[1].weight.detach().cpu().numpy()
+            stats.update({
+                f"first_layer_{k}": v
+                for k, v in _effective_rank_metrics(first_linear).items()
+            })
         elif self._clf is not None:
             coef = self._clf.coef_[0]
             stats["coef_norm"] = round(float(np.linalg.norm(coef)), 4)
+            stats.update({
+                f"coef_{k}": v
+                for k, v in _effective_rank_metrics(coef).items()
+            })
         return stats
 
     def __repr__(self) -> str:

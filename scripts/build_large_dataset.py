@@ -19,8 +19,7 @@ Targets 1000+ labelled (vuln, safe) Python code pairs via three pipelines:
 
   Pipeline C — HuggingFace datasets (no Ollama needed):
       datasets.load_dataset("s2e-lab/SecurityEval") — full 121 entries
-      datasets.load_dataset("microsoft/codexglue_defect") — Devign C (skipped,
-         C only; kept here for completeness)
+      Devign C defect dataset — skipped because it is C-only
 
 Output (per-class JSONL in redbench format):
     ../redbench/datasets/<vuln_class>/samples_generated_v3.jsonl
